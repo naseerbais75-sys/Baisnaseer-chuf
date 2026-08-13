@@ -1,0 +1,61 @@
+{
+  "videos": [
+    {
+      "title": "Latest Upload",
+      "desc": "Check out the newest video — fresh gameplay and highlights.",
+      "url": "https://youtu.be/-0gcH5Gv0JY?si=fkRmpLFfMIQj8U6N"
+    },
+    {
+      "title": "Previous Upload",
+      "desc": "An earlier upload from the channel.",
+      "url": "https://youtu.be/dz0tSTVwxyg?si=O4ncXvE-wbshAvDf"
+    }
+  ],
+  "products": [
+    {
+      "title": "Real Cricket World Cup 2026 Patch",
+      "price": "200 PKR",
+      "desc": "Full World Cup 2026 patch for Real Cricket — updated squads, kits and tournament mode.",
+      "image": "rc-worldcup2026.jpg",
+      "payNumber": "+923279970519",
+      "orderNumber": "923234787263"
+    }
+  ],
+  "links": [
+    {
+      "type": "youtube",
+      "icon": "YT",
+      "label": "YouTube",
+      "sub": "Subscribe for new videos",
+      "url": "https://youtube.com/@baisgaminglive?si=syaqeK0jgxq1_0kF"
+    },
+    {
+      "type": "discord",
+      "icon": "DC",
+      "label": "Discord",
+      "sub": "Join the community server",
+      "url": "https://discord.gg/FtNJfcEF"
+    },
+    {
+      "type": "whatsapp",
+      "icon": "WA",
+      "label": "WhatsApp Channel",
+      "sub": "Follow for updates",
+      "url": "https://whatsapp.com/channel/0029Vb7OTl7IHphRKwM9AD0H"
+    },
+    {
+      "type": "whatsapp",
+      "icon": "WA",
+      "label": "WhatsApp Contact",
+      "sub": "Message directly",
+      "url": "https://wa.me/923234787263"
+    },
+    {
+      "type": "instagram",
+      "icon": "IG",
+      "label": "Instagram",
+      "sub": "Photos and stories",
+      "url": "https://www.instagram.com/baisnaseer1?igsh=ZmdyYndlMzNwbmFi"
+    }
+  ]
+}

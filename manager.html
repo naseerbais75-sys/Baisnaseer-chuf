@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Manager — Bais Naseer</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#08070d; --panel:#131220; --panel-line:#28243d;
+    --purple:#9b5cff; --silver:#c9c8d6; --violet:#6a3fd8;
+    --text:#ece9f7; --dim:#8f8aa8;
+    --grad: linear-gradient(90deg, var(--silver), var(--purple));
+  }
+  *{box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent;}
+  body{ background:var(--bg); color:var(--text); font-family:'Rajdhani',sans-serif; padding:24px 16px 80px; }
+  @media (min-width:600px){ body{ padding:32px 24px 80px; } }
+  .wrap{ max-width:720px; margin:0 auto; }
+  h1{ font-family:'Orbitron',sans-serif; font-size:26px; margin-bottom:6px; }
+  .grad-text{ background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  p.lead{ color:var(--dim); font-size:14px; margin-bottom:26px; line-height:1.6; }
+  .card{ background:var(--panel); border:1px solid var(--panel-line); border-radius:12px; padding:20px; margin-bottom:22px; }
+  .card h2{ font-family:'Orbitron',sans-serif; font-size:18px; margin-bottom:14px; color:var(--purple); }
+  label{ display:block; font-size:12px; color:var(--dim); margin:12px 0 5px; text-transform:uppercase; letter-spacing:0.05em; }
+  input, select, textarea{ width:100%; background:#0e0c07; border:1px solid var(--panel-line); border-radius:7px;
+    padding:10px 12px; color:var(--text); font-family:'Rajdhani',sans-serif; font-size:14px; outline:none; }
+  input:focus, select:focus, textarea:focus{ border-color:var(--purple); }
+  button{ font-family:'Rajdhani',sans-serif; font-weight:700; font-size:14px; cursor:pointer; border-radius:8px; border:none; outline:none; }
+  button:focus-visible{ outline:2px solid var(--silver); outline-offset:2px; }
+  .btn-add{ margin-top:16px; padding:11px 20px; background:var(--grad); color:#12101c; }
+  .item{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px;
+    background:#0e0c07; border:1px solid var(--panel-line); border-radius:8px; margin-top:8px; font-size:13px; }
+  .item .meta{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .item .sub{ color:var(--dim); font-size:11px; }
+  .del{ background:transparent; color:#c96a5a; border:1px solid #4a2c26; padding:6px 10px; font-size:12px; flex-shrink:0; }
+  .export-btn{ width:100%; padding:14px; background:var(--grad); color:#12101c; font-size:15px; margin-top:6px; }
+  textarea#jsonOut{ margin-top:14px; height:160px; font-family:monospace; font-size:12px; }
+  .hint{ font-size:12px; color:var(--dim); margin-top:10px; line-height:1.6; }
+  .load-row{ display:flex; gap:10px; margin-bottom:20px; }
+  .load-row input[type=file]{ padding:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Content <span class="grad-text">Manager</span></h1>
+  <p class="lead">Yahan se videos aur links add/remove karo, phir neeche se naya <b>data.json</b> download karke apni site ke folder me purani file ki jagah daal do (jahan bhi site host hai — wahan replace kar dena).</p>
+
+  <div class="card">
+    <div class="load-row">
+      <input type="file" id="loadFile" accept="application/json">
+    </div>
+    <p class="hint">Pehle apni current <code>data.json</code> yahan load karo taake existing videos/links saath rahein — ya bina load kiye seedha naya add karna shuru kar sakte ho.</p>
+  </div>
+
+  <div class="card">
+    <h2>Add Video</h2>
+    <label>YouTube Link</label>
+    <input id="vUrl" placeholder="https://youtu.be/...">
+    <label>Title</label>
+    <input id="vTitle" placeholder="Video title">
+    <label>Description</label>
+    <textarea id="vDesc" rows="2" placeholder="Short description"></textarea>
+    <button class="btn-add" onclick="addVideo()">+ Add Video</button>
+    <div id="videoList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Add Product</h2>
+    <label>Title</label>
+    <input id="pTitle" placeholder="e.g. Real Cricket World Cup 2026 Patch">
+    <label>Price</label>
+    <input id="pPrice" placeholder="e.g. 200 PKR">
+    <label>Description</label>
+    <textarea id="pDesc" rows="2" placeholder="Short description"></textarea>
+    <label>Image filename (upload the image into the same repo folder as index.html)</label>
+    <input id="pImage" placeholder="e.g. product1.jpg">
+    <label>Easypaisa Number (payment)</label>
+    <input id="pPay" placeholder="e.g. +923279970519">
+    <label>WhatsApp Order Number (digits only, country code, no +)</label>
+    <input id="pOrder" placeholder="e.g. 923234787263">
+    <button class="btn-add" onclick="addProduct()">+ Add Product</button>
+    <div id="productList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Add Link</h2>
+    <label>Type</label>
+    <select id="lType">
+      <option value="youtube">YouTube</option>
+      <option value="discord">Discord</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="instagram">Instagram</option>
+      <option value="other">Other</option>
+    </select>
+    <label>Icon Text (2-3 letters)</label>
+    <input id="lIcon" placeholder="e.g. YT, DC, WA, IG">
+    <label>Label</label>
+    <input id="lLabel" placeholder="e.g. YouTube">
+    <label>Subtitle</label>
+    <input id="lSub" placeholder="e.g. Subscribe for new videos">
+    <label>URL</label>
+    <input id="lUrl" placeholder="https://...">
+    <button class="btn-add" onclick="addLink()">+ Add Link</button>
+    <div id="linkList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Export</h2>
+    <button class="export-btn" onclick="exportJSON()">Download data.json</button>
+    <textarea id="jsonOut" readonly placeholder="Preview / copy JSON manually if needed"></textarea>
+    <p class="hint">Download hone ke baad, is file ko apni site ke root folder me daal do jahan <code>index.html</code> hai — naam <b>data.json</b> hi rakhna. Product/link images bhi usi root folder me seedhe daal do (koi subfolder nahi chahiye) — bas jo filename yahan likha wahi exact naam file ka hona chahiye. Site refresh karte hi naye videos/products/links auto show ho jaayenge.</p>
+  </div>
+</div>
+
+<script>
+  let data = { videos: [], products: [], links: [] };
+
+  document.getElementById('loadFile').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try{
+        data = JSON.parse(ev.target.result);
+        data.videos = data.videos || [];
+        data.products = data.products || [];
+        data.links = data.links || [];
+        renderVideos(); renderProducts(); renderLinks();
+      }catch(err){ alert('Invalid JSON file'); }
+    };
+    reader.readAsText(file);
+  });
+
+  function addVideo(){
+    const url = document.getElementById('vUrl').value.trim();
+    const title = document.getElementById('vTitle').value.trim();
+    const desc = document.getElementById('vDesc').value.trim();
+    if(!url || !title){ alert('URL aur Title dono zaroori hain'); return; }
+    data.videos.unshift({ title, desc, url });
+    document.getElementById('vUrl').value = '';
+    document.getElementById('vTitle').value = '';
+    document.getElementById('vDesc').value = '';
+    renderVideos();
+  }
+
+  function addProduct(){
+    const title = document.getElementById('pTitle').value.trim();
+    const price = document.getElementById('pPrice').value.trim();
+    const desc = document.getElementById('pDesc').value.trim();
+    const image = document.getElementById('pImage').value.trim();
+    const payNumber = document.getElementById('pPay').value.trim();
+    const orderNumber = document.getElementById('pOrder').value.trim();
+    if(!title || !price){ alert('Title aur Price zaroori hain'); return; }
+    data.products.push({ title, price, desc, image, payNumber, orderNumber });
+    ['pTitle','pPrice','pDesc','pImage','pPay','pOrder'].forEach(id=>document.getElementById(id).value='');
+    renderProducts();
+  }
+  function renderProducts(){
+    const el = document.getElementById('productList');
+    el.innerHTML = data.products.map((p,i)=>`
+      <div class="item">
+        <div class="meta"><div>${p.title} — ${p.price}</div><div class="sub">${p.image||'no image'}</div></div>
+        <button class="del" onclick="removeProduct(${i})">Remove</button>
+      </div>`).join('');
+  }
+  function removeProduct(i){ data.products.splice(i,1); renderProducts(); }
+
+  function addLink(){
+    const type = document.getElementById('lType').value;
+    const icon = document.getElementById('lIcon').value.trim();
+    const label = document.getElementById('lLabel').value.trim();
+    const sub = document.getElementById('lSub').value.trim();
+    const url = document.getElementById('lUrl').value.trim();
+    if(!label || !url){ alert('Label aur URL zaroori hain'); return; }
+    data.links.push({ type, icon, label, sub, url });
+    document.getElementById('lIcon').value = '';
+    document.getElementById('lLabel').value = '';
+    document.getElementById('lSub').value = '';
+    document.getElementById('lUrl').value = '';
+    renderLinks();
+  }
+
+  function renderVideos(){
+    const el = document.getElementById('videoList');
+    el.innerHTML = data.videos.map((v,i)=>`
+      <div class="item">
+        <div class="meta"><div>${v.title}</div><div class="sub">${v.url}</div></div>
+        <button class="del" onclick="removeVideo(${i})">Remove</button>
+      </div>`).join('');
+  }
+  function removeVideo(i){ data.videos.splice(i,1); renderVideos(); }
+
+  function renderLinks(){
+    const el = document.getElementById('linkList');
+    el.innerHTML = data.links.map((l,i)=>`
+      <div class="item">
+        <div class="meta"><div>${l.label}</div><div class="sub">${l.url}</div></div>
+        <button class="del" onclick="removeLink(${i})">Remove</button>
+      </div>`).join('');
+  }
+  function removeLink(i){ data.links.splice(i,1); renderLinks(); }
+
+  function exportJSON(){
+    const json = JSON.stringify(data, null, 2);
+    document.getElementById('jsonOut').value = json;
+    const blob = new Blob([json], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'data.json';
+    a.click();
+  }
+</script>
+</body>
+</html>
